@@ -14,23 +14,41 @@ class FarmWorkerTest {
     fun shouldPassSingleWorker() {
         runBlocking {
             // Arrange.
-            val farm = Master<Int, Int>(Farm(Single { v -> v * 2 }, 1))
-            farm.input.send(1)
-            farm.input.send(2)
-            farm.input.send(3)
+            val m = Master<Int, Int>(Farm(Single { v -> v * 2 }, 1))
+
+            m.tasks.addAll(listOf(1, 2, 3))
 
             // Act.
-            farm.go()
+            m.go()
 
             // Assert.
-            val res1 = farm.output.receive()
-            val res2 = farm.output.receive()
-            val res3 = farm.output.receive()
-            val res = listOf(res1, res2, res3)
+            val res = m.finishedTasks
 
-            assertContains(res, 1)
+            assertContains(res, 2)
             assertContains(res, 4)
-            assertContains(res, 9)
+            assertContains(res, 6)
         }
     }
+
+    @Test
+    fun shouldPassTripleWorker() {
+        runBlocking {
+            // Arrange.
+            val m = Master<Int, Int>(Farm(Single { v -> v * 2 }, 3))
+
+            m.tasks.addAll(listOf(1, 2, 3))
+
+            // Act.
+            m.go()
+
+            // Assert.
+            val res = m.finishedTasks
+
+            assertContains(res, 2)
+            assertContains(res, 4)
+            assertContains(res, 6)
+        }
+    }
+
+
 }

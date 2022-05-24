@@ -1,30 +1,32 @@
 package klaymore.api
 
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import klaymore.Bridge
+import klaymore.patterns.Worker
 
-class Master<I, O>(private val scaffold: Scaffold<I, O>) {
+class Master<I, O>(private val scaffold: Scaffold<I, O>): Worker<I, O>() {
 
-    var input: Channel<I> private set
-    var output: Channel<O> private set
+    val tasks = mutableListOf<I>()
+    val finishedTasks = mutableListOf<O>()
 
     init {
-        input = Channel(Channel.UNLIMITED)
-        output = Channel(Channel.UNLIMITED)
+        input = Bridge()
+        output = Bridge()
     }
 
-    suspend fun go() {
+    override suspend fun go() {
+        // Load tasks.
+        tasks.forEach { input.send(it) }
+
         val worker = scaffold.build()
 
         worker.input = input
         worker.output = output
-        output.onReceive
 
-        worker.output.close() // Sends a close token immediately.
+        worker.input.close() // Sends a close token immediately.
 
         worker.go()
 
+        output.forEach { finishedTasks.add(it) }
     }
 
 }

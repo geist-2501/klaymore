@@ -1,11 +1,11 @@
 package klaymore.patterns
 
-import kotlinx.coroutines.channels.Channel
+import klaymore.Bridge
 
 abstract class Worker<I, O> {
 
-    lateinit var input: Channel<I> internal set
-    lateinit var output: Channel<O> internal set
+    lateinit var input: Bridge<I> internal set
+    lateinit var output: Bridge<O> internal set
 
     abstract suspend fun go()
 }
