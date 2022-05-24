@@ -1,6 +1,6 @@
 package klaymore.api
 
-import klaymore.Bridge
+import klaymore.structs.Bridge
 import klaymore.patterns.Worker
 
 class Master<I, O>(private val scaffold: Scaffold<I, O>): Worker<I, O>() {

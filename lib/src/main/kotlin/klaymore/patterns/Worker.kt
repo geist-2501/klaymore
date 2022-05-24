@@ -1,6 +1,6 @@
 package klaymore.patterns
 
-import klaymore.Bridge
+import klaymore.structs.Bridge
 
 abstract class Worker<I, O> {
 
@@ -8,4 +8,10 @@ abstract class Worker<I, O> {
     lateinit var output: Bridge<O> internal set
 
     abstract suspend fun go()
+
+    fun connect(other: Worker<*, *>) {
+        val worker = other as Worker<O, *>
+        output = Bridge()
+        other.input = output
+    }
 }
